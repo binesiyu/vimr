@@ -12,7 +12,8 @@ branches:
   only:
   - "/^v\\.\\d+\\.\\d+/"
 before_deploy:
-  - ls -alh ./build/Build/Products/Release
+  - pwd
+  - ls -alh ./
   - zip -r VimR.zip ./build/Build/Products/Release/VimR.app -r
 
 deploy:
