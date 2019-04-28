@@ -7,13 +7,13 @@ cache:
   - Carthage
 before_install: brew update && brew bundle
 script:
-- "./bin/build_travis.sh"
+- "./bin/build_vimr.sh"
 branches:
   only:
   - "/^v\\.\\d+\\.\\d+/"
 before_deploy:
-  - pwd
-  - ls -alh ./
+  # - pwd
+  # - ls -alh ./
   - zip -r VimR.zip ./build/Build/Products/Release/VimR.app -r
 
 deploy:
