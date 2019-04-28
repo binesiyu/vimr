@@ -16,7 +16,7 @@ deploy:
   api_key:
     secure: PIy0CnY4VLX3z5lrV0EuEXEyJnA2TE9UC7hbnkUVjgm0VBZW5UlVZPVDh8Bm2t1iDlbUXIWCJEnwVVeuXKbmOBCe0W7rSSLAHmCaAF5tc2vdPMUs40PEcFL8jTV4O8JLIBpqLAuE9rDia9mVys4jB4Ozx9JMto7G2y3S0FuZ6vJDQqL/jtrretu6aCEiBwclqt/Q5CVmliUuJEGst9H5QFxzAQZ3k3iuphPV8e0mOIW5m2xWvKXmvfaJJWX0l/v1S9JtyVavczPvH7EtR/c7QOYo87a44uwvBIjdAtDENo8X/Cts7hiljobfxZBThU6Gj0/USg3VkIihlDoCtnLpvmPNRE3dm4aqCWfJPdxdDKPJP8pKefRbjdBTCIomp1UdDSYFy6NOIdsHtlos1QUsc7cqYrsvgt/DytZYO+S+lXR9+TdgyqVZZ7TByfcMPPJaWcKUoBnwHWEnzDt0deq3Dom8tKgzXdnsgeq+PcfhfsmKn8UZm4Qbx5SqOPpOOQF3k4S3Q+3dySRY3yenPNGV5CtXpgc8C5YrwaGG241RoYpvlLzy2dCs/GoTlD7J4Uw801IOhDgeh9bcCeu2qDNjoG5p7MQW18n9JaHcCXAC6ebMRrlZmFs9XgFsAw+bjjbzuSI83kCXmZQJAmkUSrDFw8Roc3OHJN1dc6Vv9ru2kiw=
   file_glob: true
-  file: build/Build/Products/Release/*
+  file: build/Build/Products/Release/VimR.app
   skip_cleanup: true
   on:
     tags: true
