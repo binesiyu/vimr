@@ -16,7 +16,7 @@ script:
 branches:
   only:
       # - develop
-    - /^release-\d+\.\d+$/
+    - /^v\.\d+\.\d+/
 
 deploy:
   provider: releases
