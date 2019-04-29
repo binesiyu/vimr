@@ -17,6 +17,15 @@ final class CellAttributesCollection {
     special: 0xFF0000,
     reverse: false
   )
+    
+    private(set) var cursorAttributes = CellAttributes(
+        fontTrait: [],
+        foreground: 0x002b36,
+        background: 0x829496,
+        special: 0xFF0000,
+        reverse: false
+    )
+    
 
   init() {
     self.attributes[CellAttributesCollection.defaultAttributesId]

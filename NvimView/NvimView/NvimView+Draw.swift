@@ -95,14 +95,15 @@ extension NvimView {
       self.log.error("\(cursorRegion) vs. \(self.ugrid.size)")
       return
     }
-    guard let cursorAttrs = self.cellAttributesCollection.attributes(
+    /*guard let cursorAttrs = self.cellAttributesCollection.attributes(
       of: self.ugrid.cells[cursorPosition.row][cursorPosition.column].attrId
     )?.reversed else {
       self.log.error("Could not get the attributes" +
                      " at cursor: \(cursorPosition)")
       return
-    }
+    }*/
 
+    let cursorAttrs = self.cellAttributesCollection.cursorAttributes
     let attrsRun = AttributesRun(
       location: self.pointInView(
         forRow: cursorPosition.row, column: cursorPosition.column

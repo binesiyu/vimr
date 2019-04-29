@@ -333,12 +333,12 @@ extension MainWindow {
                                                            default: State.default.trackpadScrollResistance)
       self.useLiveResize = try container.decode(forKey: .useLiveResize, default: State.default.useLiveResize)
       self.drawsParallel = try container.decode(forKey: .drawsParallel, default: State.default.drawsParallel)
-      if let frameRawValue = try container.decodeIfPresent(String.self, forKey: .frame) {
+      /*if let frameRawValue = try container.decodeIfPresent(String.self, forKey: .frame) {
         self.frame = NSRectFromString(frameRawValue)
       } else {
         self.frame = CGRect(x: 100, y: 100, width: 600, height: 400)
-      }
-
+      }*/
+      self.frame = CGRect(x: 100, y: 100, width: 600, height: 400)
       self.isAllToolsVisible = try container.decode(forKey: .allToolsVisible, default: State.default.isAllToolsVisible)
       self.isToolButtonsVisible = try container.decode(forKey: .toolButtonsVisible,
                                                        default: State.default.isToolButtonsVisible)
