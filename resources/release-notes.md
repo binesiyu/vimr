@@ -1,4 +1,10 @@
-# ???
+# 0.27.4
+
+* Bugfix: File Browser sometimes does not update.
+* Dependencies updates:
+    - Neovim 0.3.7
+
+# 0.27.3
 
 * GH-725: Better character spacing; thanks @tkonolige!
 * Dependencies updates:
