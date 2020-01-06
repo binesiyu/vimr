@@ -87,10 +87,15 @@ extension NvimView {
           rowStart = r ? min(rowStart, s) : rowStart
 
         case .goto:
-          guard let row = innerArray[0].unsignedIntegerValue,
-                let col = innerArray[1].unsignedIntegerValue else { return }
+          guard let row = innerArray[0].uint64Value,
+                let col = innerArray[1].uint64Value,
+                let textPositionRow = innerArray[2].uint64Value,
+                let textPositionCol = innerArray[3].uint64Value else { return }
 
-          self.doGoto(position: Position(row: Int(row), column: Int(col)))
+          self.doGoto(
+            position: Position(row: Int(row), column: Int(col)),
+            textPosition: Position(row: Int(textPositionRow), column: Int(textPositionCol))
+          )
 
         case .scroll:
           let values = innerArray.compactMap { $0.intValue }
@@ -321,7 +326,7 @@ extension NvimView {
     return (newRowContainsWideChar, row)
   }
 
-  private func doGoto(position: Position) {
+  private func doGoto(position: Position, textPosition: Position) {
     self.bridgeLogger.debug(position)
 
     // Re-render the old cursor position.
@@ -333,6 +338,8 @@ extension NvimView {
     self.markForRender(
       region: self.cursorRegion(for: self.ugrid.cursorPosition)
     )
+
+    self.eventsSubject.onNext(.cursor(textPosition))
   }
 
   private func doScroll(_ array: [Int]) -> Int {
@@ -482,7 +489,7 @@ extension NvimView {
     }
 
     guard let id = array[0].intValue,
-          let rawTrait = array[1].unsignedIntegerValue,
+          let rawTrait = array[1].uint64Value,
           let fg = array[2].intValue,
           let bg = array[3].intValue,
           let sp = array[4].intValue,

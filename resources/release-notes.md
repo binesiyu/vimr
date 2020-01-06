@@ -1,4 +1,16 @@
-# ???
+# 0.30.0-???
+
+* Bugfix: Forward search in Markdown preview does not work.
+* Dependencies updates:
+    - IBM-Swift/BlueSocket 1.0.52
+    - elegantchaos/DictionaryCoding 1.0.7
+
+# 0.29.0-329
+
+* Dependencies updates:
+    - Neovim 0.4.3
+
+# 0.28.0-328
 
 * Add MathJax to Markdown preview
 * Dependencies updates:
