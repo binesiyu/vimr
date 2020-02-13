@@ -1,6 +1,35 @@
-# 0.30.0-???
+# Next
 
+We updated the library ShortcutRecorder to the latest version. By doing so, we store the shortcuts in a different format than before. This means that after you launched this version, old versions will not be compatible with the stored shortcuts. To delete the stored shortcuts, you can use `defaults delete com.qvacua.VimR.menuitems` in Terminal.
+
+* Show only font family names of monospace fonts.
+* Set `gui_running` to `true` (GH-476).
+* Improve drawing performance.
+* Bugfix: The cursor is not drawn when a new window is opened.
+* Bugfix: Preview in the Appearance preferences is not dark mode compatible.
+* Bugfix: Shortcut buttons are not dark mode compatible.
+* Dependencies updates:
+    - Kentzo/ShortcutRecorder@3.1
+    - httpswift/swifter@1.4.7
+    - eonil/FSEvents@0.1.6
+    - Quick/Nimble@8.0.5
+    - sparkle-project/Sparkle@1.22.0
+
+# 0.31.0-337
+
+* Improve handling of file system changes for the file browser
+
+# 0.30.0-335
+
+* Improve Open Quickly
+    - Use [The Silver Searcher](https://github.com/ggreer/the_silver_searcher)'s ignore mechanism
+    - Use [ccls](https://github.com/MaskRay/ccls)' fuzzy search
+* GH-730: Add "Close Window" menu item, which closes all tabs (and the VimR window).
+* GH-768: Bugfix: coc.nvim does not work.
+* Bugfix: VimR hangs when there are windows in which nvim is waiting for user input.
 * Bugfix: Forward search in Markdown preview does not work.
+* Bugfix: "Open Quickly" result rows are not dark mode compatible.
+* Bugfix: Enter without selecting a result in the "Open Quickly" window results in a crash.
 * Dependencies updates:
     - IBM-Swift/BlueSocket 1.0.52
     - elegantchaos/DictionaryCoding 1.0.7

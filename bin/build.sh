@@ -43,6 +43,8 @@ if [[ "${is_snapshot}" == true ]] && [[ "${branch}" == "master" ]] ; then
     exit 1
 fi
 
+git lfs install
+
 echo "### Installing some python packages"
 
 pip3 install requests
@@ -89,16 +91,8 @@ echo "### Compund version: ${compound_version}"
 echo "### Tag: ${tag}"
 echo "### VimR archive file name: ${vimr_file_name}"
 
-if [[ "${publish}" == false ]] ; then
-    echo "Do not publish => exiting now..."
-    exit 0
-fi
-
 echo "### Notarizing"
 pushd ./build/Build/Products/Release > /dev/null
-    codesign \
-        --force -s "Developer ID Application: Tae Won Ha (H96Q2NKTQH)" --timestamp --options=runtime \
-        VimR.app/Contents/Frameworks/NvimView.framework/Versions/A/PlugIns/NvimServer
     ditto -c -k --keepParent VimR.app VimR.app.zip
     echo "### Uploading"
     export readonly request_uuid=$(xcrun \
@@ -116,6 +110,11 @@ pushd ./build/Build/Products/Release > /dev/null
     xcrun stapler staple VimR.app
     tar cjf ${vimr_file_name} VimR.app
 popd > /dev/null
+
+if [[ "${publish}" == false ]] ; then
+    echo "Do not publish => exiting now..."
+    exit 0
+fi
 
 ./bin/commit_and_push_tags.sh
 ./bin/create_github_release.sh

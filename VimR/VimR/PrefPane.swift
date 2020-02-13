@@ -20,6 +20,10 @@ class PrefPane: NSView {
     return false
   }
 
+  func paneWillAppear() {
+    // noop, override
+  }
+
   func windowWillClose() {
     // noop, override
   }
@@ -29,7 +33,7 @@ class PrefPane: NSView {
 extension PrefPane {
 
   func paneTitleTextField(title: String) -> NSTextField {
-    let field = defaultTitleTextField()
+    let field = NSTextField.defaultTitleTextField()
     field.font = NSFont.boldSystemFont(ofSize: 16)
     field.alignment = .left;
     field.stringValue = title
@@ -37,7 +41,7 @@ extension PrefPane {
   }
 
   func titleTextField(title: String) -> NSTextField {
-    let field = defaultTitleTextField()
+    let field = NSTextField.defaultTitleTextField()
     field.alignment = .right;
     field.stringValue = title
     return field
@@ -64,13 +68,5 @@ extension PrefPane {
     button.setButtonType(.switch)
     button.target = self
     button.action = action
-  }
-
-  private func defaultTitleTextField() -> NSTextField {
-    let field = NSTextField(forAutoLayout: ())
-    field.backgroundColor = NSColor.clear;
-    field.isEditable = false;
-    field.isBordered = false;
-    return field
   }
 }

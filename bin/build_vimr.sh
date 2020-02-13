@@ -10,6 +10,14 @@ readonly code_sign=${code_sign:?"true or false"}
 readonly use_carthage_cache=${use_carthage_cache:?"true or false"}
 readonly build_path="./build"
 
+# Carthage often crashes => do it at the beginning.
+echo "### Updating carthage"
+if [[ ${use_carthage_cache} == true ]]; then
+    carthage update --cache-builds --platform macos
+else
+    carthage update --platform macos
+fi
+
 # Build NeoVim
 # 0. Delete previously built things
 # 1. Build normally to get the full runtime folder and copy it to the neovim's project root
@@ -39,19 +47,27 @@ pushd NvimView/neovim
     cp -r /tmp/nvim-runtime/share/nvim/runtime .
 popd > /dev/null
 
-echo "### Updating carthage"
-if [[ ${use_carthage_cache} == true ]]; then
-    carthage update --cache-builds --platform macos
-else
-    carthage update --platform macos
-fi
-
 echo "### Xcodebuilding"
 
 rm -rf ${build_path}
 
 if [[ ${code_sign} == true ]] ; then
-    xcodebuild CODE_SIGN_IDENTITY="Developer ID Application: Tae Won Ha (H96Q2NKTQH)" -configuration Release -scheme VimR -workspace VimR.xcworkspace -derivedDataPath ${build_path} clean build
+    identity="Developer ID Application: Tae Won Ha (H96Q2NKTQH)"
+    entitlements_path=$(realpath NvimView/NvimServer/NvimServer.entitlements)
+
+    xcodebuild \
+        CODE_SIGN_IDENTITY="${identity}" \
+        OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+        -configuration Release -derivedDataPath ./build -workspace VimR.xcworkspace -scheme VimR clean build
+
+    pushd ${build_path}/Build/Products/Release > /dev/null
+        codesign --force -s "${identity}" --timestamp --options=runtime --entitlements="${entitlements_path}" \
+            VimR.app/Contents/Frameworks/NvimView.framework/Versions/A/NvimServer
+        codesign --force -s "${identity}" --timestamp --options=runtime VimR.app/Contents/Frameworks/NvimView.framework/Versions/A
+        codesign --force -s "${identity}" --deep --timestamp --options=runtime VimR.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app
+        codesign --force -s "${identity}" --deep --timestamp --options=runtime VimR.app/Contents/Frameworks/Sparkle.framework/Versions/A
+    popd > /dev/null
 else
     xcodebuild -configuration Release -scheme VimR -workspace VimR.xcworkspace -derivedDataPath ${build_path} clean build
 fi

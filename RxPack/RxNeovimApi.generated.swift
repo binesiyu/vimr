@@ -43,7 +43,7 @@ extension RxNeovimApi {
 
   func bufLineCount(
     buffer: RxNeovimApi.Buffer,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -51,14 +51,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_line_count", params: params, expectsReturnValue: true)
@@ -75,7 +75,7 @@ extension RxNeovimApi {
     buffer: RxNeovimApi.Buffer,
     send_buffer: Bool,
     opts: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -92,7 +92,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_attach", params: params, expectsReturnValue: true)
@@ -107,7 +107,7 @@ extension RxNeovimApi {
 
   func bufDetach(
     buffer: RxNeovimApi.Buffer,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -122,7 +122,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_detach", params: params, expectsReturnValue: true)
@@ -140,7 +140,7 @@ extension RxNeovimApi {
     start: Int,
     end: Int,
     strict_indexing: Bool,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[String]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -158,7 +158,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_lines", params: params, expectsReturnValue: true)
@@ -177,8 +177,7 @@ extension RxNeovimApi {
     end: Int,
     strict_indexing: Bool,
     replacement: [String],
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -189,7 +188,7 @@ extension RxNeovimApi {
         .array(replacement.map { .string($0) }),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_set_lines", params: params, expectsReturnValue: expectsReturnValue)
@@ -205,7 +204,7 @@ extension RxNeovimApi {
   func bufGetOffset(
     buffer: RxNeovimApi.Buffer,
     index: Int,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -214,14 +213,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_offset", params: params, expectsReturnValue: true)
@@ -237,7 +236,7 @@ extension RxNeovimApi {
   func bufGetVar(
     buffer: RxNeovimApi.Buffer,
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -253,7 +252,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_var", params: params, expectsReturnValue: true)
@@ -268,7 +267,7 @@ extension RxNeovimApi {
 
   func bufGetChangedtick(
     buffer: RxNeovimApi.Buffer,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -276,14 +275,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_changedtick", params: params, expectsReturnValue: true)
@@ -299,7 +298,7 @@ extension RxNeovimApi {
   func bufGetKeymap(
     buffer: RxNeovimApi.Buffer,
     mode: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[Dictionary<String, RxNeovimApi.Value>]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -315,7 +314,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_keymap", params: params, expectsReturnValue: true)
@@ -334,8 +333,7 @@ extension RxNeovimApi {
     lhs: String,
     rhs: String,
     opts: Dictionary<String, RxNeovimApi.Value>,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -346,7 +344,7 @@ extension RxNeovimApi {
         .map(opts.mapToDict({ (Value.string($0), $1) })),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_set_keymap", params: params, expectsReturnValue: expectsReturnValue)
@@ -363,8 +361,7 @@ extension RxNeovimApi {
     buffer: RxNeovimApi.Buffer,
     mode: String,
     lhs: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -373,7 +370,7 @@ extension RxNeovimApi {
         .string(lhs),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_del_keymap", params: params, expectsReturnValue: expectsReturnValue)
@@ -389,7 +386,7 @@ extension RxNeovimApi {
   func bufGetCommands(
     buffer: RxNeovimApi.Buffer,
     opts: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -405,7 +402,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_commands", params: params, expectsReturnValue: true)
@@ -422,8 +419,7 @@ extension RxNeovimApi {
     buffer: RxNeovimApi.Buffer,
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -432,7 +428,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_set_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -448,8 +444,7 @@ extension RxNeovimApi {
   func bufDelVar(
     buffer: RxNeovimApi.Buffer,
     name: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -457,7 +452,7 @@ extension RxNeovimApi {
         .string(name),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_del_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -473,7 +468,7 @@ extension RxNeovimApi {
   func bufGetOption(
     buffer: RxNeovimApi.Buffer,
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -489,7 +484,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_option", params: params, expectsReturnValue: true)
@@ -506,8 +501,7 @@ extension RxNeovimApi {
     buffer: RxNeovimApi.Buffer,
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -516,7 +510,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_set_option", params: params, expectsReturnValue: expectsReturnValue)
@@ -531,7 +525,7 @@ extension RxNeovimApi {
 
   func bufGetName(
     buffer: RxNeovimApi.Buffer,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<String> {
 
     let params: [RxNeovimApi.Value] = [
@@ -546,7 +540,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_name", params: params, expectsReturnValue: true)
@@ -562,8 +556,7 @@ extension RxNeovimApi {
   func bufSetName(
     buffer: RxNeovimApi.Buffer,
     name: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -571,7 +564,7 @@ extension RxNeovimApi {
         .string(name),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_set_name", params: params, expectsReturnValue: expectsReturnValue)
@@ -586,7 +579,7 @@ extension RxNeovimApi {
 
   func bufIsLoaded(
     buffer: RxNeovimApi.Buffer,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -601,7 +594,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_is_loaded", params: params, expectsReturnValue: true)
@@ -616,7 +609,7 @@ extension RxNeovimApi {
 
   func bufIsValid(
     buffer: RxNeovimApi.Buffer,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -631,7 +624,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_is_valid", params: params, expectsReturnValue: true)
@@ -647,7 +640,7 @@ extension RxNeovimApi {
   func bufGetMark(
     buffer: RxNeovimApi.Buffer,
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[Int]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -656,14 +649,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> [Int] {
-      guard let result = (value.arrayValue?.compactMap({ v in (v.integerValue == nil ? nil : Int(v.integerValue!)) })) else {
+      guard let result = (value.arrayValue?.compactMap({ v in (v.int64Value == nil ? nil : Int(v.int64Value!)) })) else {
         throw RxNeovimApi.Error.conversion(type: [Int].self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_get_mark", params: params, expectsReturnValue: true)
@@ -683,7 +676,7 @@ extension RxNeovimApi {
     line: Int,
     col_start: Int,
     col_end: Int,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -696,14 +689,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_add_highlight", params: params, expectsReturnValue: true)
@@ -721,8 +714,7 @@ extension RxNeovimApi {
     ns_id: Int,
     line_start: Int,
     line_end: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -732,7 +724,7 @@ extension RxNeovimApi {
         .int(Int64(line_end)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_clear_namespace", params: params, expectsReturnValue: expectsReturnValue)
@@ -750,8 +742,7 @@ extension RxNeovimApi {
     ns_id: Int,
     line_start: Int,
     line_end: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -761,7 +752,7 @@ extension RxNeovimApi {
         .int(Int64(line_end)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_clear_highlight", params: params, expectsReturnValue: expectsReturnValue)
@@ -780,7 +771,7 @@ extension RxNeovimApi {
     line: Int,
     chunks: RxNeovimApi.Value,
     opts: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -792,14 +783,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_buf_set_virtual_text", params: params, expectsReturnValue: true)
@@ -814,7 +805,7 @@ extension RxNeovimApi {
 
   func tabpageListWins(
     tabpage: RxNeovimApi.Tabpage,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[RxNeovimApi.Window]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -829,7 +820,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_list_wins", params: params, expectsReturnValue: true)
@@ -845,7 +836,7 @@ extension RxNeovimApi {
   func tabpageGetVar(
     tabpage: RxNeovimApi.Tabpage,
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -861,7 +852,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_get_var", params: params, expectsReturnValue: true)
@@ -878,8 +869,7 @@ extension RxNeovimApi {
     tabpage: RxNeovimApi.Tabpage,
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -888,7 +878,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_set_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -904,8 +894,7 @@ extension RxNeovimApi {
   func tabpageDelVar(
     tabpage: RxNeovimApi.Tabpage,
     name: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -913,7 +902,7 @@ extension RxNeovimApi {
         .string(name),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_del_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -928,7 +917,7 @@ extension RxNeovimApi {
 
   func tabpageGetWin(
     tabpage: RxNeovimApi.Tabpage,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Window> {
 
     let params: [RxNeovimApi.Value] = [
@@ -943,7 +932,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_get_win", params: params, expectsReturnValue: true)
@@ -958,7 +947,7 @@ extension RxNeovimApi {
 
   func tabpageGetNumber(
     tabpage: RxNeovimApi.Tabpage,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -966,14 +955,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_get_number", params: params, expectsReturnValue: true)
@@ -988,7 +977,7 @@ extension RxNeovimApi {
 
   func tabpageIsValid(
     tabpage: RxNeovimApi.Tabpage,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1003,7 +992,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_tabpage_is_valid", params: params, expectsReturnValue: true)
@@ -1020,8 +1009,7 @@ extension RxNeovimApi {
     width: Int,
     height: Int,
     options: Dictionary<String, RxNeovimApi.Value>,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1030,7 +1018,7 @@ extension RxNeovimApi {
         .map(options.mapToDict({ (Value.string($0), $1) })),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_ui_attach", params: params, expectsReturnValue: expectsReturnValue)
@@ -1044,15 +1032,14 @@ extension RxNeovimApi {
   }
 
   func uiDetach(
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_ui_detach", params: params, expectsReturnValue: expectsReturnValue)
@@ -1068,8 +1055,7 @@ extension RxNeovimApi {
   func uiTryResize(
     width: Int,
     height: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1077,7 +1063,7 @@ extension RxNeovimApi {
         .int(Int64(height)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_ui_try_resize", params: params, expectsReturnValue: expectsReturnValue)
@@ -1093,8 +1079,7 @@ extension RxNeovimApi {
   func uiSetOption(
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1102,7 +1087,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_ui_set_option", params: params, expectsReturnValue: expectsReturnValue)
@@ -1119,8 +1104,7 @@ extension RxNeovimApi {
     grid: Int,
     width: Int,
     height: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1129,7 +1113,7 @@ extension RxNeovimApi {
         .int(Int64(height)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_ui_try_resize_grid", params: params, expectsReturnValue: expectsReturnValue)
@@ -1144,15 +1128,14 @@ extension RxNeovimApi {
 
   func uiPumSetHeight(
     height: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .int(Int64(height)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_ui_pum_set_height", params: params, expectsReturnValue: expectsReturnValue)
@@ -1167,15 +1150,14 @@ extension RxNeovimApi {
 
   func command(
     command: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(command),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_command", params: params, expectsReturnValue: expectsReturnValue)
@@ -1191,7 +1173,7 @@ extension RxNeovimApi {
   func getHlByName(
     name: String,
     rgb: Bool,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1207,7 +1189,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_hl_by_name", params: params, expectsReturnValue: true)
@@ -1223,7 +1205,7 @@ extension RxNeovimApi {
   func getHlById(
     hl_id: Int,
     rgb: Bool,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1239,7 +1221,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_hl_by_id", params: params, expectsReturnValue: true)
@@ -1256,8 +1238,7 @@ extension RxNeovimApi {
     keys: String,
     mode: String,
     escape_csi: Bool,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1266,7 +1247,7 @@ extension RxNeovimApi {
         .bool(escape_csi),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_feedkeys", params: params, expectsReturnValue: expectsReturnValue)
@@ -1281,7 +1262,7 @@ extension RxNeovimApi {
 
   func input(
     keys: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1289,14 +1270,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_input", params: params, expectsReturnValue: true)
@@ -1316,8 +1297,7 @@ extension RxNeovimApi {
     grid: Int,
     row: Int,
     col: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1329,7 +1309,7 @@ extension RxNeovimApi {
         .int(Int64(col)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_input_mouse", params: params, expectsReturnValue: expectsReturnValue)
@@ -1347,7 +1327,7 @@ extension RxNeovimApi {
     from_part: Bool,
     do_lt: Bool,
     special: Bool,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<String> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1365,7 +1345,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_replace_termcodes", params: params, expectsReturnValue: true)
@@ -1380,7 +1360,7 @@ extension RxNeovimApi {
 
   func commandOutput(
     command: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<String> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1395,7 +1375,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_command_output", params: params, expectsReturnValue: true)
@@ -1410,7 +1390,7 @@ extension RxNeovimApi {
 
   func eval(
     expr: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1425,7 +1405,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_eval", params: params, expectsReturnValue: true)
@@ -1441,7 +1421,7 @@ extension RxNeovimApi {
   func executeLua(
     code: String,
     args: RxNeovimApi.Value,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1457,7 +1437,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_execute_lua", params: params, expectsReturnValue: true)
@@ -1473,7 +1453,7 @@ extension RxNeovimApi {
   func callFunction(
     fn: String,
     args: RxNeovimApi.Value,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1489,7 +1469,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_call_function", params: params, expectsReturnValue: true)
@@ -1506,7 +1486,7 @@ extension RxNeovimApi {
     dict: RxNeovimApi.Value,
     fn: String,
     args: RxNeovimApi.Value,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1523,7 +1503,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_call_dict_function", params: params, expectsReturnValue: true)
@@ -1538,7 +1518,7 @@ extension RxNeovimApi {
 
   func strwidth(
     text: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1546,14 +1526,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_strwidth", params: params, expectsReturnValue: true)
@@ -1567,7 +1547,7 @@ extension RxNeovimApi {
   }
 
   func listRuntimePaths(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[String]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1582,7 +1562,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_list_runtime_paths", params: params, expectsReturnValue: true)
@@ -1597,15 +1577,14 @@ extension RxNeovimApi {
 
   func setCurrentDir(
     dir: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(dir),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_current_dir", params: params, expectsReturnValue: expectsReturnValue)
@@ -1619,7 +1598,7 @@ extension RxNeovimApi {
   }
 
   func getCurrentLine(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<String> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1634,7 +1613,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_current_line", params: params, expectsReturnValue: true)
@@ -1649,15 +1628,14 @@ extension RxNeovimApi {
 
   func setCurrentLine(
     line: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(line),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_current_line", params: params, expectsReturnValue: expectsReturnValue)
@@ -1671,15 +1649,14 @@ extension RxNeovimApi {
   }
 
   func delCurrentLine(
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_del_current_line", params: params, expectsReturnValue: expectsReturnValue)
@@ -1694,7 +1671,7 @@ extension RxNeovimApi {
 
   func getVar(
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1709,7 +1686,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_var", params: params, expectsReturnValue: true)
@@ -1725,8 +1702,7 @@ extension RxNeovimApi {
   func setVar(
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1734,7 +1710,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -1749,15 +1725,14 @@ extension RxNeovimApi {
 
   func delVar(
     name: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(name),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_del_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -1772,7 +1747,7 @@ extension RxNeovimApi {
 
   func getVvar(
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1787,7 +1762,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_vvar", params: params, expectsReturnValue: true)
@@ -1803,8 +1778,7 @@ extension RxNeovimApi {
   func setVvar(
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1812,7 +1786,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_vvar", params: params, expectsReturnValue: expectsReturnValue)
@@ -1827,7 +1801,7 @@ extension RxNeovimApi {
 
   func getOption(
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1842,7 +1816,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_option", params: params, expectsReturnValue: true)
@@ -1858,8 +1832,7 @@ extension RxNeovimApi {
   func setOption(
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -1867,7 +1840,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_option", params: params, expectsReturnValue: expectsReturnValue)
@@ -1882,15 +1855,14 @@ extension RxNeovimApi {
 
   func outWrite(
     str: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(str),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_out_write", params: params, expectsReturnValue: expectsReturnValue)
@@ -1905,15 +1877,14 @@ extension RxNeovimApi {
 
   func errWrite(
     str: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(str),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_err_write", params: params, expectsReturnValue: expectsReturnValue)
@@ -1928,15 +1899,14 @@ extension RxNeovimApi {
 
   func errWriteln(
     str: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(str),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_err_writeln", params: params, expectsReturnValue: expectsReturnValue)
@@ -1950,7 +1920,7 @@ extension RxNeovimApi {
   }
 
   func listBufs(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[RxNeovimApi.Buffer]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1965,7 +1935,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_list_bufs", params: params, expectsReturnValue: true)
@@ -1979,7 +1949,7 @@ extension RxNeovimApi {
   }
 
   func getCurrentBuf(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Buffer> {
 
     let params: [RxNeovimApi.Value] = [
@@ -1994,7 +1964,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_current_buf", params: params, expectsReturnValue: true)
@@ -2009,15 +1979,14 @@ extension RxNeovimApi {
 
   func setCurrentBuf(
     buffer: RxNeovimApi.Buffer,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .int(Int64(buffer.handle)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_current_buf", params: params, expectsReturnValue: expectsReturnValue)
@@ -2031,7 +2000,7 @@ extension RxNeovimApi {
   }
 
   func listWins(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[RxNeovimApi.Window]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2046,7 +2015,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_list_wins", params: params, expectsReturnValue: true)
@@ -2060,7 +2029,7 @@ extension RxNeovimApi {
   }
 
   func getCurrentWin(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Window> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2075,7 +2044,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_current_win", params: params, expectsReturnValue: true)
@@ -2090,15 +2059,14 @@ extension RxNeovimApi {
 
   func setCurrentWin(
     window: RxNeovimApi.Window,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .int(Int64(window.handle)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_current_win", params: params, expectsReturnValue: expectsReturnValue)
@@ -2114,7 +2082,7 @@ extension RxNeovimApi {
   func createBuf(
     listed: Bool,
     scratch: Bool,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Buffer> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2130,7 +2098,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_create_buf", params: params, expectsReturnValue: true)
@@ -2147,7 +2115,7 @@ extension RxNeovimApi {
     buffer: RxNeovimApi.Buffer,
     enter: Bool,
     config: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Window> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2164,7 +2132,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_open_win", params: params, expectsReturnValue: true)
@@ -2178,7 +2146,7 @@ extension RxNeovimApi {
   }
 
   func listTabpages(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[RxNeovimApi.Tabpage]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2193,7 +2161,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_list_tabpages", params: params, expectsReturnValue: true)
@@ -2207,7 +2175,7 @@ extension RxNeovimApi {
   }
 
   func getCurrentTabpage(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Tabpage> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2222,7 +2190,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_current_tabpage", params: params, expectsReturnValue: true)
@@ -2237,15 +2205,14 @@ extension RxNeovimApi {
 
   func setCurrentTabpage(
     tabpage: RxNeovimApi.Tabpage,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .int(Int64(tabpage.handle)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_current_tabpage", params: params, expectsReturnValue: expectsReturnValue)
@@ -2260,7 +2227,7 @@ extension RxNeovimApi {
 
   func createNamespace(
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2268,14 +2235,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_create_namespace", params: params, expectsReturnValue: true)
@@ -2289,7 +2256,7 @@ extension RxNeovimApi {
   }
 
   func getNamespaces(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2304,7 +2271,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_namespaces", params: params, expectsReturnValue: true)
@@ -2321,7 +2288,7 @@ extension RxNeovimApi {
     data: String,
     crlf: Bool,
     phase: Int,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2338,7 +2305,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_paste", params: params, expectsReturnValue: true)
@@ -2356,8 +2323,7 @@ extension RxNeovimApi {
     type: String,
     after: Bool,
     follow: Bool,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -2367,7 +2333,7 @@ extension RxNeovimApi {
         .bool(follow),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_put", params: params, expectsReturnValue: expectsReturnValue)
@@ -2382,15 +2348,14 @@ extension RxNeovimApi {
 
   func subscribe(
     event: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(event),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_subscribe", params: params, expectsReturnValue: expectsReturnValue)
@@ -2405,15 +2370,14 @@ extension RxNeovimApi {
 
   func unsubscribe(
     event: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         .string(event),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_unsubscribe", params: params, expectsReturnValue: expectsReturnValue)
@@ -2428,7 +2392,7 @@ extension RxNeovimApi {
 
   func getColorByName(
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2436,14 +2400,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_color_by_name", params: params, expectsReturnValue: true)
@@ -2457,7 +2421,7 @@ extension RxNeovimApi {
   }
 
   func getColorMap(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2472,7 +2436,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_color_map", params: params, expectsReturnValue: true)
@@ -2487,7 +2451,7 @@ extension RxNeovimApi {
 
   func getContext(
     opts: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2502,7 +2466,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_context", params: params, expectsReturnValue: true)
@@ -2517,7 +2481,7 @@ extension RxNeovimApi {
 
   func loadContext(
     dict: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2532,7 +2496,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_load_context", params: params, expectsReturnValue: true)
@@ -2564,7 +2528,7 @@ extension RxNeovimApi {
 
   func getKeymap(
     mode: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[Dictionary<String, RxNeovimApi.Value>]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2579,7 +2543,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_keymap", params: params, expectsReturnValue: true)
@@ -2597,8 +2561,7 @@ extension RxNeovimApi {
     lhs: String,
     rhs: String,
     opts: Dictionary<String, RxNeovimApi.Value>,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -2608,7 +2571,7 @@ extension RxNeovimApi {
         .map(opts.mapToDict({ (Value.string($0), $1) })),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_keymap", params: params, expectsReturnValue: expectsReturnValue)
@@ -2624,8 +2587,7 @@ extension RxNeovimApi {
   func delKeymap(
     mode: String,
     lhs: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -2633,7 +2595,7 @@ extension RxNeovimApi {
         .string(lhs),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_del_keymap", params: params, expectsReturnValue: expectsReturnValue)
@@ -2648,7 +2610,7 @@ extension RxNeovimApi {
 
   func getCommands(
     opts: Dictionary<String, RxNeovimApi.Value>,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2663,7 +2625,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_commands", params: params, expectsReturnValue: true)
@@ -2677,7 +2639,7 @@ extension RxNeovimApi {
   }
 
   func getApiInfo(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2692,7 +2654,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_api_info", params: params, expectsReturnValue: true)
@@ -2711,8 +2673,7 @@ extension RxNeovimApi {
     type: String,
     methods: Dictionary<String, RxNeovimApi.Value>,
     attributes: Dictionary<String, RxNeovimApi.Value>,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -2723,7 +2684,7 @@ extension RxNeovimApi {
         .map(attributes.mapToDict({ (Value.string($0), $1) })),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_set_client_info", params: params, expectsReturnValue: expectsReturnValue)
@@ -2738,7 +2699,7 @@ extension RxNeovimApi {
 
   func getChanInfo(
     chan: Int,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2753,7 +2714,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_chan_info", params: params, expectsReturnValue: true)
@@ -2767,7 +2728,7 @@ extension RxNeovimApi {
   }
 
   func listChans(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2782,7 +2743,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_list_chans", params: params, expectsReturnValue: true)
@@ -2797,7 +2758,7 @@ extension RxNeovimApi {
 
   func callAtomic(
     calls: RxNeovimApi.Value,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2812,7 +2773,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_call_atomic", params: params, expectsReturnValue: true)
@@ -2829,7 +2790,7 @@ extension RxNeovimApi {
     expr: String,
     flags: String,
     highlight: Bool,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2846,7 +2807,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_parse_expression", params: params, expectsReturnValue: true)
@@ -2860,7 +2821,7 @@ extension RxNeovimApi {
   }
 
   func listUis(
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2875,7 +2836,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_list_uis", params: params, expectsReturnValue: true)
@@ -2890,7 +2851,7 @@ extension RxNeovimApi {
 
   func getProcChildren(
     pid: Int,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2905,7 +2866,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_proc_children", params: params, expectsReturnValue: true)
@@ -2920,7 +2881,7 @@ extension RxNeovimApi {
 
   func getProc(
     pid: Int,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2935,7 +2896,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_get_proc", params: params, expectsReturnValue: true)
@@ -2953,8 +2914,7 @@ extension RxNeovimApi {
     insert: Bool,
     finish: Bool,
     opts: Dictionary<String, RxNeovimApi.Value>,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -2964,7 +2924,7 @@ extension RxNeovimApi {
         .map(opts.mapToDict({ (Value.string($0), $1) })),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_select_popupmenu_item", params: params, expectsReturnValue: expectsReturnValue)
@@ -2979,7 +2939,7 @@ extension RxNeovimApi {
 
   func winGetBuf(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Buffer> {
 
     let params: [RxNeovimApi.Value] = [
@@ -2994,7 +2954,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_buf", params: params, expectsReturnValue: true)
@@ -3010,8 +2970,7 @@ extension RxNeovimApi {
   func winSetBuf(
     window: RxNeovimApi.Window,
     buffer: RxNeovimApi.Buffer,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3019,7 +2978,7 @@ extension RxNeovimApi {
         .int(Int64(buffer.handle)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_buf", params: params, expectsReturnValue: expectsReturnValue)
@@ -3034,7 +2993,7 @@ extension RxNeovimApi {
 
   func winGetCursor(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[Int]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3042,14 +3001,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> [Int] {
-      guard let result = (value.arrayValue?.compactMap({ v in (v.integerValue == nil ? nil : Int(v.integerValue!)) })) else {
+      guard let result = (value.arrayValue?.compactMap({ v in (v.int64Value == nil ? nil : Int(v.int64Value!)) })) else {
         throw RxNeovimApi.Error.conversion(type: [Int].self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_cursor", params: params, expectsReturnValue: true)
@@ -3065,8 +3024,7 @@ extension RxNeovimApi {
   func winSetCursor(
     window: RxNeovimApi.Window,
     pos: [Int],
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3074,7 +3032,7 @@ extension RxNeovimApi {
         .array(pos.map { .int(Int64($0)) }),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_cursor", params: params, expectsReturnValue: expectsReturnValue)
@@ -3089,7 +3047,7 @@ extension RxNeovimApi {
 
   func winGetHeight(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3097,14 +3055,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_height", params: params, expectsReturnValue: true)
@@ -3120,8 +3078,7 @@ extension RxNeovimApi {
   func winSetHeight(
     window: RxNeovimApi.Window,
     height: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3129,7 +3086,7 @@ extension RxNeovimApi {
         .int(Int64(height)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_height", params: params, expectsReturnValue: expectsReturnValue)
@@ -3144,7 +3101,7 @@ extension RxNeovimApi {
 
   func winGetWidth(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3152,14 +3109,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_width", params: params, expectsReturnValue: true)
@@ -3175,8 +3132,7 @@ extension RxNeovimApi {
   func winSetWidth(
     window: RxNeovimApi.Window,
     width: Int,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3184,7 +3140,7 @@ extension RxNeovimApi {
         .int(Int64(width)),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_width", params: params, expectsReturnValue: expectsReturnValue)
@@ -3200,7 +3156,7 @@ extension RxNeovimApi {
   func winGetVar(
     window: RxNeovimApi.Window,
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3216,7 +3172,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_var", params: params, expectsReturnValue: true)
@@ -3233,8 +3189,7 @@ extension RxNeovimApi {
     window: RxNeovimApi.Window,
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3243,7 +3198,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -3259,8 +3214,7 @@ extension RxNeovimApi {
   func winDelVar(
     window: RxNeovimApi.Window,
     name: String,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3268,7 +3222,7 @@ extension RxNeovimApi {
         .string(name),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_del_var", params: params, expectsReturnValue: expectsReturnValue)
@@ -3284,7 +3238,7 @@ extension RxNeovimApi {
   func winGetOption(
     window: RxNeovimApi.Window,
     name: String,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Value> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3300,7 +3254,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_option", params: params, expectsReturnValue: true)
@@ -3317,8 +3271,7 @@ extension RxNeovimApi {
     window: RxNeovimApi.Window,
     name: String,
     value: RxNeovimApi.Value,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3327,7 +3280,7 @@ extension RxNeovimApi {
         value,
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_option", params: params, expectsReturnValue: expectsReturnValue)
@@ -3342,7 +3295,7 @@ extension RxNeovimApi {
 
   func winGetPosition(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<[Int]> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3350,14 +3303,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> [Int] {
-      guard let result = (value.arrayValue?.compactMap({ v in (v.integerValue == nil ? nil : Int(v.integerValue!)) })) else {
+      guard let result = (value.arrayValue?.compactMap({ v in (v.int64Value == nil ? nil : Int(v.int64Value!)) })) else {
         throw RxNeovimApi.Error.conversion(type: [Int].self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_position", params: params, expectsReturnValue: true)
@@ -3372,7 +3325,7 @@ extension RxNeovimApi {
 
   func winGetTabpage(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<RxNeovimApi.Tabpage> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3387,7 +3340,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_tabpage", params: params, expectsReturnValue: true)
@@ -3402,7 +3355,7 @@ extension RxNeovimApi {
 
   func winGetNumber(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Int> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3410,14 +3363,14 @@ extension RxNeovimApi {
     ]
 
     func transform(_ value: Value) throws -> Int {
-      guard let result = ((value.integerValue == nil ? nil : Int(value.integerValue!))) else {
+      guard let result = ((value.int64Value == nil ? nil : Int(value.int64Value!))) else {
         throw RxNeovimApi.Error.conversion(type: Int.self)
       }
 
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_number", params: params, expectsReturnValue: true)
@@ -3432,7 +3385,7 @@ extension RxNeovimApi {
 
   func winIsValid(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Bool> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3447,7 +3400,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_is_valid", params: params, expectsReturnValue: true)
@@ -3463,8 +3416,7 @@ extension RxNeovimApi {
   func winSetConfig(
     window: RxNeovimApi.Window,
     config: Dictionary<String, RxNeovimApi.Value>,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3472,7 +3424,7 @@ extension RxNeovimApi {
         .map(config.mapToDict({ (Value.string($0), $1) })),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_set_config", params: params, expectsReturnValue: expectsReturnValue)
@@ -3487,7 +3439,7 @@ extension RxNeovimApi {
 
   func winGetConfig(
     window: RxNeovimApi.Window,
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<Dictionary<String, RxNeovimApi.Value>> {
 
     let params: [RxNeovimApi.Value] = [
@@ -3502,7 +3454,7 @@ extension RxNeovimApi {
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_get_config", params: params, expectsReturnValue: true)
@@ -3518,8 +3470,7 @@ extension RxNeovimApi {
   func winClose(
     window: RxNeovimApi.Window,
     force: Bool,
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
@@ -3527,7 +3478,7 @@ extension RxNeovimApi {
         .bool(force),
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "nvim_win_close", params: params, expectsReturnValue: expectsReturnValue)
@@ -3553,7 +3504,7 @@ extension RxNeovimApi.Buffer {
       return nil
     }
 
-    guard let handle = (try? unpack(data))?.value.integerValue else {
+    guard let handle = (try? unpack(data))?.value.int64Value else {
       return nil
     }
 
@@ -3572,7 +3523,7 @@ extension RxNeovimApi.Window {
       return nil
     }
 
-    guard let handle = (try? unpack(data))?.value.integerValue else {
+    guard let handle = (try? unpack(data))?.value.int64Value else {
       return nil
     }
 
@@ -3591,7 +3542,7 @@ extension RxNeovimApi.Tabpage {
       return nil
     }
 
-    guard let handle = (try? unpack(data))?.value.integerValue else {
+    guard let handle = (try? unpack(data))?.value.int64Value else {
       return nil
     }
 

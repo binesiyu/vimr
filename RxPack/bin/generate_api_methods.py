@@ -12,15 +12,14 @@ import io
 
 void_func_template = Template('''\
   func ${func_name}(${args}
-    expectsReturnValue: Bool = true,
-    checkBlocked: Bool = true
+    expectsReturnValue: Bool = false
   ) -> Completable {
 
     let params: [RxNeovimApi.Value] = [
         ${params}
     ]
 
-    if expectsReturnValue && checkBlocked {
+    if expectsReturnValue {
       return self
         .checkBlocked(
           self.rpc(method: "${nvim_func_name}", params: params, expectsReturnValue: expectsReturnValue)
@@ -55,7 +54,7 @@ get_mode_func_template = Template('''\
 
 func_template = Template('''\
   func ${func_name}(${args}
-    checkBlocked: Bool = true
+    errWhenBlocked: Bool = true
   ) -> Single<${result_type}> {
 
     let params: [RxNeovimApi.Value] = [
@@ -70,7 +69,7 @@ func_template = Template('''\
       return result
     }
 
-    if checkBlocked {
+    if errWhenBlocked {
       return self
         .checkBlocked(
           self.rpc(method: "${nvim_func_name}", params: params, expectsReturnValue: true)
@@ -140,7 +139,7 @@ extension RxNeovimApi.Buffer {
       return nil
     }
 
-    guard let handle = (try? unpack(data))?.value.integerValue else {
+    guard let handle = (try? unpack(data))?.value.int64Value else {
       return nil
     }
 
@@ -159,7 +158,7 @@ extension RxNeovimApi.Window {
       return nil
     }
 
-    guard let handle = (try? unpack(data))?.value.integerValue else {
+    guard let handle = (try? unpack(data))?.value.int64Value else {
       return nil
     }
 
@@ -178,7 +177,7 @@ extension RxNeovimApi.Tabpage {
       return nil
     }
 
-    guard let handle = (try? unpack(data))?.value.integerValue else {
+    guard let handle = (try? unpack(data))?.value.int64Value else {
       return nil
     }
 
@@ -280,7 +279,7 @@ def msgpack_to_swift(msgpack_value_name, type):
         return f'{msgpack_value_name}.boolValue'
 
     if type == 'Int':
-        return f'({msgpack_value_name}.integerValue == nil ? nil : Int({msgpack_value_name}.integerValue!))'
+        return f'({msgpack_value_name}.int64Value == nil ? nil : Int({msgpack_value_name}.int64Value!))'
 
     if type == 'Float':
         return f'{msgpack_value_name}.floatValue'

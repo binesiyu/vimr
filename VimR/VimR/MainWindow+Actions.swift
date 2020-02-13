@@ -31,7 +31,7 @@ extension MainWindow {
     case .toggleTools:
       guard params.count == 1 else { return }
 
-      let param = params[0].integerValue
+      let param = params[0].int64Value
 
       if params.isEmpty || param == 0 {
         self.toggleAllTools(self)
@@ -44,7 +44,7 @@ extension MainWindow {
     case .toggleToolButtons:
       guard params.count == 1 else { return }
 
-      let param = params[0].integerValue
+      let param = params[0].int64Value
 
       if params.isEmpty || param == 0 {
         self.toggleToolButtons(self)
@@ -60,7 +60,7 @@ extension MainWindow {
     case .setFont:
       guard params.count == 2 else { return }
       guard let fontName = params[0].stringValue,
-            let fontSize = params[1].integerValue,
+            let fontSize = params[1].int64Value,
             let font = NSFont(name: fontName, size: fontSize.cgf)
         else {
         return
@@ -155,6 +155,11 @@ extension MainWindow {
 
   @IBAction func openQuickly(_ sender: Any?) {
     self.emit(self.uuidAction(for: .openQuickly))
+  }
+
+  @IBAction func closeWindow(_ sender: Any?) {
+    self.closeWindow = true
+    self.window.performClose(nil)
   }
 
   @IBAction func saveDocument(_ sender: Any?) {

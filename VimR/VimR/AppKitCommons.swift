@@ -9,29 +9,30 @@ import CocoaMarkdown
 extension NSColor {
 
   static var random: NSColor {
-    return NSColor(calibratedRed: CGFloat.random(in: 0...1),
-                   green: CGFloat.random(in: 0...1),
-                   blue: CGFloat.random(in: 0...1),
-                   alpha: 1.0)
+    NSColor(
+      calibratedRed: .random(in: 0...1),
+      green: .random(in: 0...1),
+      blue: .random(in: 0...1),
+      alpha: 1.0
+    )
   }
 
-  var hex: String {
+  var int: Int {
     if let color = self.usingColorSpace(.sRGB) {
-      return "#" +
-             String(format: "%X", Int(color.redComponent * 255)) +
-             String(format: "%X", Int(color.greenComponent * 255)) +
-             String(format: "%X", Int(color.blueComponent * 255)) +
-             String(format: "%X", Int(color.alphaComponent * 255))
+      let a = Int(color.alphaComponent * 255)
+      let r = Int(color.redComponent * 255)
+      let g = Int(color.greenComponent * 255)
+      let b = Int(color.blueComponent * 255)
+      return a << 24 | r << 16 | g << 8 | b
     } else {
-      return self.description
+      return 0
     }
   }
+
+  var hex: String { String(format: "%X", self.int) }
 
   func brightening(by factor: CGFloat) -> NSColor {
-    guard let color = self.usingColorSpace(.sRGB) else {
-      // TODO: what to do?
-      return self
-    }
+    guard let color = self.usingColorSpace(.sRGB) else { return self }
 
     let h = color.hueComponent
     let s = color.saturationComponent
@@ -45,8 +46,7 @@ extension NSColor {
 extension NSImage {
 
   func tinting(with color: NSColor) -> NSImage {
-
-    let result: NSImage = self.copy() as! NSImage
+    let result = self.copy() as! NSImage
 
     result.lockFocus()
     color.set()
@@ -60,26 +60,16 @@ extension NSImage {
 extension NSButton {
 
   var boolState: Bool {
-    get {
-      return self.state == .on ? true : false
-    }
-
-    set {
-      self.state = newValue ? .on : .off
-    }
+    get { self.state == .on ? true : false }
+    set { self.state = newValue ? .on : .off }
   }
 }
 
 extension NSMenuItem {
 
   var boolState: Bool {
-    get {
-      return self.state == .on ? true : false
-    }
-
-    set {
-      self.state = newValue ? .on : .off
-    }
+    get { self.state == .on ? true : false }
+    set { self.state = newValue ? .on : .off }
   }
 }
 
@@ -104,9 +94,7 @@ extension NSAttributedString {
     (translation as NSAffineTransform).concat()
   }
 
-  var wholeRange: NSRange {
-    return NSRange(location: 0, length: self.length)
-  }
+  var wholeRange: NSRange { NSRange(location: 0, length: self.length) }
 
   static func infoLabel(markdown: String) -> NSAttributedString {
     let size = NSFont.smallSystemFontSize
@@ -137,21 +125,13 @@ extension NSAttributedString {
 
 extension NSView {
 
-  func removeAllSubviews() {
-    self.subviews.forEach { $0.removeFromSuperview() }
-  }
+  func removeAllSubviews() { self.subviews.forEach { $0.removeFromSuperview() } }
 
-  func removeAllConstraints() {
-    self.removeConstraints(self.constraints)
-  }
+  func removeAllConstraints() { self.removeConstraints(self.constraints) }
 
-  @objc var isFirstResponder: Bool {
-    return self.window?.firstResponder == self
-  }
+  @objc var isFirstResponder: Bool { self.window?.firstResponder == self }
 
-  func beFirstResponder() {
-    self.window?.makeFirstResponder(self)
-  }
+  func beFirstResponder() { self.window?.makeFirstResponder(self) }
 }
 
 extension NSTableView {
@@ -203,21 +183,17 @@ extension NSOutlineView {
   }
 
   /**
-   The selected item. When the selection is empty, then returns `nil`. When multiple items are selected, then returns
-   the last selected item.
+   The selected item. When the selection is empty, then returns `nil`.
+   When multiple items are selected, then returns the last selected item.
    */
   var selectedItem: Any? {
-    if self.selectedRow < 0 {
-      return nil
-    }
+    if self.selectedRow < 0 { return nil }
 
     return self.item(atRow: self.selectedRow)
   }
 
   var clickedItem: Any? {
-    if self.clickedRow < 0 {
-      return nil
-    }
+    if self.clickedRow < 0 { return nil }
 
     return self.item(atRow: self.clickedRow)
   }
@@ -228,6 +204,17 @@ extension NSOutlineView {
     } else {
       self.expandItem(item)
     }
+  }
+}
+
+extension NSTextField {
+
+  static func defaultTitleTextField() -> NSTextField {
+    let field = NSTextField(forAutoLayout: ())
+    field.backgroundColor = NSColor.clear;
+    field.isEditable = false;
+    field.isBordered = false;
+    return field
   }
 }
 
@@ -245,3 +232,29 @@ extension NSScrollView {
     return scrollView
   }
 }
+
+extension NSFontManager {
+
+  func monospacedRegularFontNames() -> [String] {
+    self
+      .availableFontFamilies
+      .compactMap { name -> [(String, [Any])]? in
+        guard let members = self.availableMembers(ofFontFamily: name) else { return nil }
+        return members.map { member in (name, member) }
+      }
+      .flatMap { $0 }
+      .filter { element in
+        guard let trait = element.1[3] as? NSNumber,
+              let weight = element.1[2] as? NSNumber,
+              trait.uint32Value == NSFontDescriptor.SymbolicTraits.monoSpace.rawValue,
+              weight.intValue == regularWeight
+          else { return false }
+
+        return true
+      }
+      .map { $0.0 }
+      .uniqueing()
+  }
+}
+
+private let regularWeight = 5

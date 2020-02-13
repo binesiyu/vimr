@@ -11,25 +11,20 @@ import ShortcutRecorder
 class ShortcutsPref: PrefPane,
                      UiComponent,
                      NSOutlineViewDelegate,
-                     SRRecorderControlDelegate {
+                     RecorderControlDelegate {
 
   typealias StateType = AppState
 
   @objc dynamic var content = [ShortcutItem]()
 
-  override var displayName: String {
-    return "Shortcuts"
-  }
+  override var displayName: String { "Shortcuts" }
 
-  override var pinToContainer: Bool {
-    return true
-  }
+  override var pinToContainer: Bool { true }
 
-  required init(
-    source: Observable<StateType>,
-    emitter: ActionEmitter,
-    state: StateType
-  ) {
+  required init(source: Observable<StateType>, emitter: ActionEmitter, state: StateType) {
+    // We know that the identifier is not empty.
+    let shortcutSuiteName = Bundle.main.bundleIdentifier! + ".menuitems"
+    self.shortcutsUserDefaults = UserDefaults(suiteName: shortcutSuiteName)
     self.shortcutsDefaultsController = NSUserDefaultsController(
       defaults: self.shortcutsUserDefaults,
       initialValues: nil
@@ -37,14 +32,26 @@ class ShortcutsPref: PrefPane,
 
     super.init(frame: .zero)
 
-    initShortcutUserDefaults()
+    if let version = self.shortcutsUserDefaults?.integer(forKey: defaultsVersionKey),
+       version > defaultsVersion {
+      let alert = NSAlert()
+      alert.alertStyle = .warning
+      alert.messageText = "Incompatible Defaults for Shortcuts"
+      alert.informativeText = "The stored defaults for shortcuts are not compatible with "
+                              + "this version of VimR. You can delete the stored defaults "
+                              + "by executing 'defaults delete com.qvacua.VimR.menuitems' "
+                              + "in Terminal."
+      alert.runModal()
+      return
+    }
+
+    self.migrateDefaults()
+    self.initShortcutUserDefaults()
 
     self.addViews()
 
     self.initShortcutItems()
-    if let children = self.shortcutItemsRoot.children {
-      self.content.append(contentsOf: children)
-    }
+    if let children = self.shortcutItemsRoot.children { self.content.append(contentsOf: children) }
 
     self.initMenuItemsBindings()
     self.initOutlineViewBindings()
@@ -52,33 +59,52 @@ class ShortcutsPref: PrefPane,
     self.shortcutList.expandItem(nil, expandChildren: true)
   }
 
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
+  required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
   private let shortcutList = NSOutlineView.standardOutlineView()
   private let shortcutScrollView = NSScrollView.standardScrollView()
   private let resetButton = NSButton(forAutoLayout: ())
 
   private let treeController = NSTreeController()
-  private let shortcutItemsRoot = ShortcutItem(
-    title: "root", isLeaf: false, item: nil
-  )
+  private let shortcutItemsRoot = ShortcutItem(title: "root", isLeaf: false, item: nil)
 
-  private let keyEqTransformer = SRKeyEquivalentTransformer()
-  private let keyEqModTransformer = SRKeyEquivalentModifierMaskTransformer()
+  private let keyEqTransformer = DataToKeyEquivalentTransformer()
+  private let keyEqModTransformer = DataToKeyEquivalentModifierMaskTransformer()
 
-  private let shortcutsUserDefaults = UserDefaults(
-    suiteName: "com.qvacua.VimR.menuitems"
-  )
+  private let shortcutsUserDefaults: UserDefaults?
   private let shortcutsDefaultsController: NSUserDefaultsController
 
+  private func migrateDefaults() {
+    if (self.shortcutsUserDefaults?.integer(forKey: defaultsVersionKey) ?? 0) == defaultsVersion {
+      return
+    }
+
+    legacyDefaultShortcuts.forEach { id in
+      let shortcut: Shortcut?
+      if let dict = self.shortcutsUserDefaults?.value(forKey: id) as? [String: Any] {
+        shortcut = Shortcut(dictionary: dict)
+      } else {
+        shortcut = defaultShortcuts[id] ?? nil
+      }
+
+      let data = ValueTransformer
+        .keyedUnarchiveFromDataTransformer
+        .reverseTransformedValue(shortcut) as? NSData
+      self.shortcutsUserDefaults?.set(data, forKey: id)
+    }
+
+    self.shortcutsUserDefaults?.set(defaultsVersion, forKey: defaultsVersionKey)
+  }
+
   private func initShortcutUserDefaults() {
-    defaultShortcuts.forEach { identifier, shortcutData in
-      if self.shortcutsUserDefaults?.value(forKey: identifier) == nil {
-        self.shortcutsUserDefaults?.set(shortcutData, forKey: identifier)
+    let transformer = ValueTransformer(forName: .keyedUnarchiveFromDataTransformerName)!
+    defaultShortcuts.forEach { id, shortcut in
+      if self.shortcutsUserDefaults?.value(forKey: id) == nil {
+        let shortcutData = transformer.reverseTransformedValue(shortcut) as? NSData
+        self.shortcutsUserDefaults?.set(shortcutData, forKey: id)
       }
     }
+    self.shortcutsUserDefaults?.set(defaultsVersion, forKey: defaultsVersionKey)
   }
 
   private func initOutlineViewBindings() {
@@ -88,16 +114,14 @@ class ShortcutsPref: PrefPane,
     self.treeController.objectClass = ShortcutItem.self
     self.treeController.avoidsEmptySelection = false
     self.treeController.preservesSelection = true
-    self.treeController.sortDescriptors = [
-      NSSortDescriptor(key: "title", ascending: true)
-    ]
+    self.treeController.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
     self.treeController.bind(.contentArray, to: self, withKeyPath: "content")
-    self.shortcutList.bind(.content,
-                           to: self.treeController,
-                           withKeyPath: "arrangedObjects")
-    self.shortcutList.bind(.selectionIndexPaths,
-                           to: self.treeController,
-                           withKeyPath: "selectionIndexPaths")
+    self.shortcutList.bind(.content, to: self.treeController, withKeyPath: "arrangedObjects")
+    self.shortcutList.bind(
+      .selectionIndexPaths,
+      to: self.treeController,
+      withKeyPath: "selectionIndexPaths"
+    )
   }
 
   private func traverseMenuItems(with fn: (String, NSMenuItem) -> Void) {
@@ -109,9 +133,7 @@ class ShortcutsPref: PrefPane,
         continue
       }
 
-      guard let menuItem = item.item, let identifier = item.identifier else {
-        continue
-      }
+      guard let menuItem = item.item, let identifier = item.identifier else { continue }
 
       fn(identifier, menuItem)
     }
@@ -150,9 +172,7 @@ class ShortcutsPref: PrefPane,
       guard let entry = queue.popLast() else { break }
 
       if !entry.shortcutItem.isLeaf
-         || entry.shortcutItem
-              .identifier?
-              .hasPrefix("com.qvacua.vimr.menuitems.") == true {
+         || entry.shortcutItem.identifier?.hasPrefix("com.qvacua.vimr.menuitems.") == true {
 
         entry.parent.children?.append(entry.shortcutItem)
       }
@@ -165,9 +185,11 @@ class ShortcutsPref: PrefPane,
           .map { menuItem in
             (
               parent: entry.shortcutItem,
-              shortcutItem: ShortcutItem(title: menuItem.title,
-                                         isLeaf: !menuItem.hasSubmenu,
-                                         item: menuItem)
+              shortcutItem: ShortcutItem(
+                title: menuItem.title,
+                isLeaf: !menuItem.hasSubmenu,
+                item: menuItem
+              )
             )
           }
         queue.append(contentsOf: shortcutChildItems)
@@ -198,13 +220,9 @@ class ShortcutsPref: PrefPane,
 
     paneTitle.autoPinEdge(toSuperviewEdge: .top, withInset: 18)
     paneTitle.autoPinEdge(toSuperviewEdge: .left, withInset: 18)
-    paneTitle.autoPinEdge(
-      toSuperviewEdge: .right, withInset: 18, relation: .greaterThanOrEqual
-    )
+    paneTitle.autoPinEdge(toSuperviewEdge: .right, withInset: 18, relation: .greaterThanOrEqual)
 
-    shortcutScrollView.autoPinEdge(
-      .top, to: .bottom, of: paneTitle, withOffset: 18
-    )
+    shortcutScrollView.autoPinEdge(.top, to: .bottom, of: paneTitle, withOffset: 18)
     shortcutScrollView.autoPinEdge(.left, to: .left, of: paneTitle)
     shortcutScrollView.autoPinEdge(toSuperviewEdge: .right, withInset: 18)
 
@@ -229,10 +247,13 @@ extension ShortcutsPref {
     alert.beginSheetModal(for: window, completionHandler: { response in
       guard response == .alertSecondButtonReturn else { return }
       self.traverseMenuItems { identifier, _ in
-        self.shortcutsDefaultsController.setValue(
-          defaultShortcuts[identifier],
-          forKeyPath: "values.\(identifier)"
-        )
+        let shortcut = defaultShortcuts[identifier] ?? Shortcut(keyEquivalent: "")
+        let valueToWrite = ValueTransformer
+          .keyedUnarchiveFromDataTransformer
+          .reverseTransformedValue(shortcut)
+
+        self.shortcutsDefaultsController.setValue(valueToWrite, forKeyPath: "values.\(identifier)")
+        self.treeController.rearrangeObjects()
       }
     })
   }
@@ -243,37 +264,26 @@ extension ShortcutsPref {
 
   private func isUppercase(_ str: String) -> Bool {
     for c in str.unicodeScalars {
-      if !CharacterSet.uppercaseLetters.contains(c) {
-        return false
-      }
+      if !CharacterSet.uppercaseLetters.contains(c) { return false }
     }
 
     return true
   }
 
-  func outlineView(
-    _ outlineView: NSOutlineView,
-    rowViewForItem item: Any
-  ) -> NSTableRowView? {
+  func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
     let view = self.shortcutList.makeView(
       withIdentifier: NSUserInterfaceItemIdentifier("shortcut-row-view"),
       owner: self
-    ) as? ShortcutTableRow
-               ?? ShortcutTableRow(withIdentifier: "shortcut-row-view")
+    ) as? ShortcutTableRow ?? ShortcutTableRow(withIdentifier: "shortcut-row-view")
 
     return view
   }
 
-  func outlineView(
-    _: NSOutlineView,
-    viewFor tableColumn: NSTableColumn?,
-    item: Any
-  ) -> NSView? {
+  func outlineView(_: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
     let cellView = self.shortcutList.makeView(
       withIdentifier: NSUserInterfaceItemIdentifier("shortcut-cell-view"),
       owner: self
-    ) as? ShortcutTableCell
-                   ?? ShortcutTableCell(withIdentifier: "shortcut-cell-view")
+    ) as? ShortcutTableCell ?? ShortcutTableCell(withIdentifier: "shortcut-cell-view")
 
     let repObj = (item as? NSTreeNode)?.representedObject
     guard let item = repObj as? ShortcutItem else { return nil }
@@ -288,68 +298,60 @@ extension ShortcutsPref {
       return cellView
     }
 
-    cellView.customized = !self.shortcutsAreEqual(
-      self.shortcutsDefaultsController
-        .value(forKeyPath: "values.\(identifier)"),
-      defaultShortcuts[identifier]
-    )
+    cellView.customized = !self.areShortcutsEqual(identifier)
     cellView.layoutViews()
     cellView.setDelegateOfRecorder(self)
-    cellView.bindRecorder(
-      toKeyPath: "values.\(identifier)",
-      to: self.shortcutsDefaultsController
-    )
+    cellView.bindRecorder(toKeyPath: "values.\(identifier)", to: self.shortcutsDefaultsController)
 
     return cellView
   }
 
-  func outlineView(_: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
-    return 28
-  }
+  func outlineView(_: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat { 28 }
 
-  private func shortcutsAreEqual(_ lhs: Any?, _ rhs: Any?) -> Bool {
-    if lhs == nil && rhs == nil {
-      return true
-    }
+  private func areShortcutsEqual(_ identifier: String) -> Bool {
+    guard let dataFromDefaults = self.shortcutsDefaultsController.value(
+      forKeyPath: "values.\(identifier)"
+    ) as? NSData else { return true }
 
-    guard let lhsShortcut = lhs as? [String: Any],
-          let rhsShortcut = rhs as? [String: Any]
-      else {
-      return false
-    }
+    guard let shortcutFromDefaults = ValueTransformer
+      .keyedUnarchiveFromDataTransformer
+      .transformedValue(dataFromDefaults) as? Shortcut else { return true }
 
-    if lhsShortcut.isEmpty && rhsShortcut.isEmpty {
-      return true
-    }
+    let defaultShortcut = defaultShortcuts[identifier] ?? nil
 
-    if lhsShortcut[SRShortcutCharacters] as? String
-       != rhsShortcut[SRShortcutCharacters] as? String {
-      return false
-    }
-
-    if lhsShortcut[SRShortcutCharactersIgnoringModifiers] as? String
-       != rhsShortcut[SRShortcutCharactersIgnoringModifiers] as? String {
-      return false
-    }
-
-    if lhsShortcut[SRShortcutKeyCode] as? Int
-       != rhsShortcut[SRShortcutKeyCode] as? Int {
-      return false
-    }
-
-    if lhsShortcut[SRShortcutModifierFlagsKey] as? Int
-       != rhsShortcut[SRShortcutModifierFlagsKey] as? Int {
-      return false
-    }
-
-    return true
+    return shortcutFromDefaults.isEqual(to: defaultShortcut) == true
   }
 }
 
 // MARK: - SRRecorderControlDelegate
 extension ShortcutsPref {
 
-  func shortcutRecorderDidEndRecording(_ sender: SRRecorderControl!) {
+  func recorderControlDidEndRecording(_ sender: RecorderControl) {
     self.treeController.rearrangeObjects()
+  }
+}
+
+private let defaultsVersionKey = "version"
+private let defaultsVersion = 337
+
+private class DataToKeyEquivalentTransformer: ValueTransformer {
+
+  override func transformedValue(_ value: Any?) -> Any? {
+    guard let shortcut = ValueTransformer
+      .keyedUnarchiveFromDataTransformer
+      .transformedValue(value) as? Shortcut else { return "" }
+
+    return KeyEquivalentTransformer.shared.transformedValue(shortcut)
+  }
+}
+
+private class DataToKeyEquivalentModifierMaskTransformer: ValueTransformer {
+
+  override func transformedValue(_ value: Any?) -> Any? {
+    guard let shortcut = ValueTransformer
+      .keyedUnarchiveFromDataTransformer
+      .transformedValue(value) as? Shortcut else { return NSNumber(value: 0) }
+
+    return KeyEquivalentModifierMaskTransformer.shared.transformedValue(shortcut)
   }
 }
