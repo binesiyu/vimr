@@ -7,7 +7,7 @@ cache:
   - Carthage
 before_install: brew update && brew bundle
 script:
-- "./bin/build_vimr.sh"
+- "./bin/build_vimr_old.sh"
 branches:
   only:
   - "/^v\\.\\d+\\.\\d+/"
